@@ -1,30 +1,29 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { withAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import CardList from './CardList';
+import CardList from './CardList'
+import './AllDataAPI.css';
 
-
-
-class AllDataAPI extends React.Component {
+class AllDataAPI extends Component {
     constructor() {
         super();
         this.state = {
-            cList: [],
-            favList: []
+            allDataList: [],
         }
     }
 
     componentDidMount = async () => {
-        let list = await axios.get('https://ltuc-asac-api.herokuapp.com/allChocolateData/')
+
+        let list = await axios.get(`${process.env.REACT_APP_SERVER}/getDataFromApi`);
         console.log(list.data);
         this.setState({
-            cList: list.data,
+            allDataList: list.data,
         })
     }
 
-    addToFav = async (item) => {
-        await axios.post(`${process.env.REACT_APP_SERVER_LINK}/addToFav?email=${this.props.auth0.user.email}`, item)
+    addToFavorites = async (item) => {
+        await axios.post(`${process.env.REACT_APP_SERVER}/addFav?email=${this.props.auth0.user.email}`, item)
+
     }
 
 
@@ -32,14 +31,17 @@ class AllDataAPI extends React.Component {
     render() {
         return (
             <>
-                <h1>All Data from the API</h1>
-                <h3>Select your favorites :)</h3>
-                {this.state.cList.map((item, index) => {
-                    console.log(item);
-                    return (
-                        <CardList key={index} item={item} addToFav={this.addToFav} />
-                    )
-                })}
+                <div>
+                    <h1>All Data from the API</h1>
+                    <h3>Select your favorites :)</h3>
+                </div>
+                <div className="container">
+                    {this.state.allDataList.map((item, index) => {
+                        return (
+                            <CardList key={index} item={item} addToFavorites={this.addToFavorites} />
+                        )
+                    })}
+                </div>
             </>
         )
     }

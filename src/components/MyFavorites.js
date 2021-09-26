@@ -1,64 +1,81 @@
-// import React from 'react';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import '././MyFavorites.js';
-// import { withAuth0 } from '@auth0/auth0-react';
-// import Favcard from './Favcard'
+import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './MyFavorites.css';
+import { withAuth0 } from '@auth0/auth0-react';
+import axios from 'axios';
+import FavCard from './FavCard'
+import UpdateModel from './UpdateModel'
+class MyFavorites extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      favDataList: [],
+      selectedItem: {},
+      showUpdateFav: false,
 
-// class MyFavorites extends React.Component {
-// constructor() {
-//   super();
-//   this.state={
-//     favList: [],
-//     show: false,
-//     selecteditem:{},
-//   }
-// }
+    }
+  }
+  componentDidMount = async () => {
 
-// componentDidMount = async ()=> {
-//   let favList = await axios.get (`${process.env.REACT_APP_SERVER_LINK}/getFav?email=${this.props.user.email}`)
-//   this.setState({
-//     favList:favList.data,
-//   })
-// }
-// showModel= async (selecteditem)=>{
-//   await this.setState({
-//     show:true,
-//     selecteditem:selecteditem,
-//   })
-// }
+    let list = await axios.get(`${process.env.REACT_APP_SERVER}/getFav?email=${this.props.auth0.user.email}`);
+    console.log(list.data);
+    this.setState({
+      favDataList: list.data,
+    })
+  }
+  deleteFav = async (id) => {
+    console.log(id);
+    let list = await axios.delete(`${process.env.REACT_APP_SERVER}/deleteFav/${id}?email=${this.props.auth0.user.email}`);
+    this.setState({
+      favDataList: list.data,
+    })
+  }
 
-// handelUpdate= async (selecteditem)=>{
-//   let favList = await axios.put(`${process.env.REACT_APP_SERVER_LINK}/updateFav/${selecteditem.idfromDb}`,selecteditem);
-//   this.setState({
-//     favList: favList.data,
-//   })
-// }
+  showUpdateFav = async (item) => {
+    console.log("sdfsadgdfhg");
+    this.setState({
+      showUpdateFav: true,
+      selectedItem: item,
+    })
+  }
 
-// deletFav= async (id) => {
-//   let favList = await axios.delete(`${process.env.REACT_APP_SERVER_LINK}/deleteFav/${id}/email=${this.props.user.email}`)
-//   this.setState({
-//     favList: favList.data,
-//   })
-// }
+  handleClose = async () => {
+    this.setState({
+      showUpdateFav: false,
+    })
+  }
+  update = async (selectedItem) => {
+    let list = await axios.put(`${process.env.REACT_APP_SERVER}/updateFav/${selectedItem.id}?email=${this.props.auth0.user.email}`, selectedItem)
+    this.setState({
+      favDataList: list.data,
+    })
+  }
 
-// handelClose=async()=>{
-//   await this.setState({
-//     show:false,
-//   })
-// }
 
-//   render() {
-//     return(
-//       <>
-//         <h1>My Favorites</h1>
-//         <p>
-//           This is a collection of my favorites
-//         </p>
-//         return()
-//       </>
-//     )
-//   }
-// }
+  render() {
+    return (
+      <>
+        <h1>My Favorites</h1>
+        <p>
+          This is a collection of my favorites
+        </p>
+        <div className="container">
+          {this.state.favDataList.map((item, index) => {
+            return (
+              <FavCard key={index} item={item} deleteFav={this.deleteFav} showUpdateFav={this.showUpdateFav} />
+            )
+          })}
+        </div>
 
-// export default withAuth0(MyFavorites);
+        {this.state.favDataList.length === 0 && <div style={{ backgroundColor: "yellow" }}>
+          <h2>Your List is Empty ¯_(ツ)_/¯ </h2>
+        </div>}
+
+        <UpdateModel show={this.state.showUpdateFav} item={this.state.selectedItem} handleClose={this.handleClose} update={this.update} />
+      </>
+    )
+  }
+}
+
+export default withAuth0(MyFavorites);
 

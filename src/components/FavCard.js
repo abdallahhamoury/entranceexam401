@@ -2,7 +2,7 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Card, Button } from 'react-bootstrap';
 
-class CardList extends React.Component {
+class FavCard extends React.Component {
   render() {
     return (
       <>
@@ -10,7 +10,8 @@ class CardList extends React.Component {
           <Card.Img variant="top" src={this.props.item.imageUrl} />
           <Card.Body>
             <Card.Title>name : {this.props.item.title}</Card.Title>
-            <Button variant="primary" onClick={() => { this.props.addToFavorites(this.props.item) }} >Add To Favorites</Button>
+            <Button variant="primary" onClick={() => { this.props.deleteFav(this.props.item._id) }} >delete</Button>
+            <Button variant="primary" onClick={() => { this.props.showUpdateFav(this.props.item) }} >update</Button>
           </Card.Body>
         </Card>
       </>
@@ -18,5 +19,4 @@ class CardList extends React.Component {
   }
 }
 
-export default CardList;
-
+export default FavCard;
